@@ -4,10 +4,9 @@ import pickle
 import numpy as np
 import os
 import hashlib
-from preprocessing import preprocess_and_save  # <-- مهم جدًا
+from preprocessing import preprocess_and_save
 
 def get_documents_hash(folder="documents"):
-    """يحسب هاش لكل ملفات النصوص عشان نعرف لو اتغيرت"""
     if not os.path.exists(folder):
         print(f"Warning: Folder '{folder}' not found!")
         return "no_folder"
@@ -37,7 +36,6 @@ def train_and_prepare():
         if old_hash == current_hash:
             should_reprocess = False
 
-    # لو مفيش تغيير → نحمل الجاهز بس
     if not should_reprocess and \
        os.path.exists("processed_data.pkl") and \
        os.path.exists("word2vec_english.model") and \
@@ -50,7 +48,6 @@ def train_and_prepare():
         doc_tokens = data["doc_tokens"]
         
     else:
-        # لو في تغيير أو أول مرة → كل حاجة من الأول
         print("Documents changed or first run → Reprocessing everything from scratch...")
         sentences, _, doc_tokens = preprocess_and_save()
         
@@ -83,15 +80,12 @@ def train_and_prepare():
             pickle.dump(doc_vectors, f)
         print("Document vectors saved!")
 
-        # حفظ الهاش الجديد
         with open(hash_file, "w", encoding="utf-8") as f:
             f.write(current_hash)
         
         print("All done! New hash saved.")
 
-    # مهم نرجّع القيم دي عشان main.py يستخدمها
     return sentences, doc_tokens
 
-# عشان تقدر تشغل الملف لوحده للتجربة
 if __name__ == "__main__":
     train_and_prepare()
